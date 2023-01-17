@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-
 import Button from '../Button';
-import Toast from '../Toast/Toast';
-
+import ToastShelf from '../ToastShelf/ToastShelf';
 import styles from './ToastPlayground.module.css';
 
 const VARIANT_OPTIONS = ['notice', 'warning', 'success', 'error'];
@@ -10,10 +8,45 @@ const VARIANT_OPTIONS = ['notice', 'warning', 'success', 'error'];
 function ToastPlayground() {
   const [message, setMessage] = useState('');
   const [variant, setVariant] = useState('notice' | 'warning' | 'success' | 'error');
-  const [showToast, setShowToast] = useState(false);
 
-  function handleDismiss() {
-    setShowToast(false);
+  const [toasts, setToasts] = React.useState([
+    {
+      id: crypto.randomUUID(),
+      message: 'Something went wrong!',
+      variant: 'error'
+    },
+    {
+      id: crypto.randomUUID(),
+      message: '17 photos uploaded',
+      variant: 'success'
+    },
+  ]
+  );
+
+
+  function handleDismiss(id) {
+    const newToasts = toasts.filter(toast => {
+      return toast.id !== id
+    })
+
+    setToasts(newToasts);
+  }
+
+  function hendleCreatePost(event) {
+    event.preventDefault();
+
+    const newToast = [
+      ...toasts,
+      {
+        id: crypto.randomUUID(),
+        message,
+        variant
+      }
+    ]
+
+    setToasts(newToast);
+    setMessage('');
+    setVariant(VARIANT_OPTIONS[0]);
   }
 
   return (
@@ -23,9 +56,9 @@ function ToastPlayground() {
         <h1>Toast Playground</h1>
       </header>
 
-      {showToast && <Toast handleDismiss={handleDismiss} message={message} variant={variant}></Toast>}
+      <ToastShelf toasts={toasts} handleDismiss={handleDismiss} />
 
-      <div className={styles.controlsWrapper}>
+      <form className={styles.controlsWrapper} onSubmit={(event) => hendleCreatePost(event)}>
         <div className={styles.row}>
           <label
             htmlFor="message"
@@ -68,12 +101,10 @@ function ToastPlayground() {
           <div
             className={`${styles.inputWrapper} ${styles.radioWrapper}`}
           >
-            <Button onClick={() => {
-              setShowToast(true)
-            }}>Pop Toast!</Button>
+            <Button type="submit">Pop Toast!</Button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
