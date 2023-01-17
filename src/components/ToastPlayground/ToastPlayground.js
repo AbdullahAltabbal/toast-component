@@ -2,49 +2,20 @@ import React, { useState } from 'react';
 import Button from '../Button';
 import ToastShelf from '../ToastShelf/ToastShelf';
 import styles from './ToastPlayground.module.css';
+import { ToastContext } from '../ToastProvider'
 
 const VARIANT_OPTIONS = ['notice', 'warning', 'success', 'error'];
 
 function ToastPlayground() {
+
   const [message, setMessage] = useState('');
   const [variant, setVariant] = useState('notice' | 'warning' | 'success' | 'error');
-
-  const [toasts, setToasts] = React.useState([
-    {
-      id: crypto.randomUUID(),
-      message: 'Something went wrong!',
-      variant: 'error'
-    },
-    {
-      id: crypto.randomUUID(),
-      message: '17 photos uploaded',
-      variant: 'success'
-    },
-  ]
-  );
-
-
-  function handleDismiss(id) {
-    const newToasts = toasts.filter(toast => {
-      return toast.id !== id
-    })
-
-    setToasts(newToasts);
-  }
+  const { createNewToast } = React.useContext(ToastContext)
 
   function hendleCreatePost(event) {
     event.preventDefault();
 
-    const newToast = [
-      ...toasts,
-      {
-        id: crypto.randomUUID(),
-        message,
-        variant
-      }
-    ]
-
-    setToasts(newToast);
+    createNewToast(message, variant)
     setMessage('');
     setVariant(VARIANT_OPTIONS[0]);
   }
@@ -56,7 +27,7 @@ function ToastPlayground() {
         <h1>Toast Playground</h1>
       </header>
 
-      <ToastShelf toasts={toasts} handleDismiss={handleDismiss} />
+      <ToastShelf />
 
       <form className={styles.controlsWrapper} onSubmit={(event) => hendleCreatePost(event)}>
         <div className={styles.row}>
